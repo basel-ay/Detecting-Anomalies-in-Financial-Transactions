@@ -54,4 +54,72 @@ After completing the lab you should be familiar with:
 >3. the application of autoencoder neural networks to detect anomalies in large-scale financial data, and,
 >4. the interpretation of the detection results of the networks as well as its reconstruction loss. 
 
-Please note, that this lab is neither a complete nor comprehensive forensic data analysis approach or fraud examination strategy. However, the methodology and code provided in this lab can be modified or adapted to detect anomalous records in a variety of financial datasets. Subsequently, the detected records might serve as a starting point for a more detailed and substantive examination by auditors or compliance personnel. 
+Please note, that this lab is neither a complete nor comprehensive forensic data analysis approach or fraud examination strategy. However, the methodology and code provided in this lab can be modified or adapted to detect anomalous records in a variety of financial datasets. Subsequently, the detected records might serve as a starting point for a more detailed and substantive examination by auditors or compliance personnel.
+
+### Initial Data and Attribute Assessment
+
+The dataset was augmented and renamed the attributes to appear more similar to a real-world dataset that one usually observes in SAP-ERP systems as part of SAP's Finance and Cost controlling (FICO) module. 
+
+The dataset contains a subset of in total 7 categorical and 2 numerical attributes available in the FICO BKPF (containing the posted journal entry headers) and BSEG (containing the posted journal entry segments) tables. Please, find below a list of the individual attributes as well as a brief description of their respective semantics:
+
+>- `BELNR`: the accounting document number,
+>- `BUKRS`: the company code,
+>- `BSCHL`: the posting key,
+>- `HKONT`: the posted general ledger account,
+>- `PRCTR`: the posted profit center,
+>- `WAERS`: the currency key,
+>- `KTOSL`: the general ledger account key,
+>- `DMBTR`: the amount in local currency,
+>- `WRBTR`: the amount in document currency.
+
+Let's also have a closer look into the top 10 rows of the dataset:
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/64821137/231604111-a92a5690-7cb1-4f08-a860-63f0d445f84b.png" />
+</p>
+
+You may also have noticed the attribute `label` in the data. We will use this field throughout to evaluate the quality of our trained models. The field describes the true nature of each individual transaction of either being a **regular** transaction (denoted by `regular`) or an **anomaly** (denoted by `global` and `local`).
+
+### Autoencoder Neural Networks (AENNs)
+
+The objective of this section is to familiarize ourselves with the underlying idea and concepts of building a deep autoencoder neural network (AENN). We will cover the major building blocks and the specific network structure of AENNs as well as an exemplary implementation using the open source machine learning library PyTorch.
+
+### Autoencoder Neural Network Architecture
+
+
+
+AENNs or "Replicator Neural Networks" are a variant of general feed-forward neural networks that have been initially introduced by Hinton and Salakhutdinov in [6]. AENNs usually comprise a **symmetrical network architecture** as well as a central hidden layer, referred to as **"latent"** or **"coding" layer**, of lower dimensionality. The design is chosen intentionally since the training objective of an AENN is to reconstruct its input in a "self-supervised" manner. 
+
+below illustrates a schematic view of an autoencoder neural network:
+
+![image](https://user-images.githubusercontent.com/64821137/231604818-312778e7-a652-450f-82a1-ab242fb1a5cf.png)
+
+**Figure:** Schematic view of an autoencoder network comprised of two non-linear mappings (fully connected feed forward neural networks) referred to as encoder $f_\theta: \mathbb{R}^{dx} \mapsto \mathbb{R}^{dz}$ and decoder $g_\theta: \mathbb{R}^{dz} \mapsto \mathbb{R}^{dx}$.
+
+Furthermore, AENNs can be interpreted as "lossy" data **compression algorithms**. They are "lossy" in a sense that the reconstructed outputs will be degraded compared to the original inputs. The difference between the original input $x^i$ and its reconstruction $\hat{x}^i$ is referred to as **reconstruction error**. In general, AENNs encompass three major building blocks:
+
+
+>   1. an encoding mapping function $f_\theta$, 
+>   2. a decoding mapping function $g_\theta$, 
+>   3. and a loss function $\mathcal{L_{\theta}}$.
+
+Most commonly the encoder and the decoder mapping functions consist of **several layers of neurons followed by a non-linear function** and shared parameters $\theta$. The encoder mapping $f_\theta(\cdot)$ maps an input vector (e.g. an "one-hot" encoded transaction) $x^i$ to a compressed representation $z^i$ referred to as latent space $Z$. This hidden representation $z^i$ is then mapped back by the decoder $g_\theta(\cdot)$ to a re-constructed vector $\hat{x}^i$ of the original input space (e.g. the re-constructed encoded transaction). Formally, the nonlinear mappings of the encoder- and the decoder-function can be defined by:
+
+<p align="center">
+  $f_\theta(x^i) = s(Wx^i + b)$, and $g_\theta(z^i) = s′(W′z^i + d)$
+</p>
+
+where $s$ and $s′$ denote non-linear activations with model parameters $\theta = \{W, b, W', d\}$, $W \in \mathbb{R}^{d_x \times d_z}, W' \in \mathbb{R}^{d_z \times d_y}$ are weight matrices and $b \in \mathbb{R}^{dx}$, $d \in \mathbb{R}^{dz}$ are offset bias vectors.
+
+### 4.2 Autoencoder Neural Network Implementation
+
+Some elements of the encoder network code below should be given particular attention:
+
+>- `self.encoder_Lx`: defines the linear transformation of the layer applied to the incoming input: $Wx + b$.
+>- `nn.init.xavier_uniform`: inits the layer weights using a uniform distribution. 
+>- `self.encoder_Rx`: defines the non-linear transformation of the layer: $\sigma(\cdot)$.
+>- `self.dropout`: randomly zeros some of the elements of the input tensor with probability $p$.
+
+We use **"Leaky ReLUs"** as introduced by Xu et al. to avoid "dying" non-linearities and to speed up training convergence. Leaky ReLUs allow a small gradient even when a particular neuron is not active. In addition, we include the **"drop-out" probability**, which defines the probability rate for each neuron to be set to zero at a forward pass to prevent the network from overfitting. 
+
+Initially, we set the dropout probability of each neuron to $p=0.0$ (0%), meaning that none of the neuron activiations will be set to zero, the default interpretation of the dropout hyperparameter is the probability of training a given node in a layer, where 1.0 means no dropout, and 0.0 means no outputs from the layer.
