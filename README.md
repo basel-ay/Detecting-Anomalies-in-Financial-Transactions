@@ -111,7 +111,7 @@ Most commonly the encoder and the decoder mapping functions consist of **several
 
 where $s$ and $s′$ denote non-linear activations with model parameters $\theta = \{W, b, W', d\}$, $W \in \mathbb{R}^{d_x \times d_z}, W' \in \mathbb{R}^{d_z \times d_y}$ are weight matrices and $b \in \mathbb{R}^{dx}$, $d \in \mathbb{R}^{dz}$ are offset bias vectors.
 
-### 4.2 Autoencoder Neural Network Implementation
+### Autoencoder Neural Network Implementation
 
 Some elements of the encoder network code below should be given particular attention:
 
@@ -123,3 +123,11 @@ Some elements of the encoder network code below should be given particular atten
 We use **"Leaky ReLUs"** as introduced by Xu et al. to avoid "dying" non-linearities and to speed up training convergence. Leaky ReLUs allow a small gradient even when a particular neuron is not active. In addition, we include the **"drop-out" probability**, which defines the probability rate for each neuron to be set to zero at a forward pass to prevent the network from overfitting. 
 
 Initially, we set the dropout probability of each neuron to $p=0.0$ (0%), meaning that none of the neuron activiations will be set to zero, the default interpretation of the dropout hyperparameter is the probability of training a given node in a layer, where 1.0 means no dropout, and 0.0 means no outputs from the layer.
+
+### Evaluating the Autoencoder Neural Network (AENN) Model
+
+The visualization reveals that the pre-trained model is able to reconstruct the majority of regular journal entries, while failing to do so, for the anomalous ones. As a result, the model reconstruction error can be used to distinguish both "global" anomalies (orange) and "local" anomalies (green) from the regular journal entries (blue).
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/64821137/231606709-1c1b4aa9-41f4-4e41-b494-a5b2e0ebfd1a.png" />
+</p>
