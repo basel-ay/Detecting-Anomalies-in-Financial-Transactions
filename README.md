@@ -1,28 +1,6 @@
 # Detecting Anomalies in Financial Transactions
 
-The Association of Certified Fraud Examiners estimates in its Global Fraud Study 2016 that the typical organization loses 5% of its annual revenues due to fraud. According to Joseph T. Wells the term **"fraud"** refers to, 
-
->_"the abuse of one's occupation for personal enrichment through the deliberate misuse of an organization's resources or assets"_. 
-
-A similar more recent study, conducted by the auditors of PwC, revealed that 30% of the study respondents experienced losses of between \$100,000 and \$5 million USD in the last 24 months. The study also showed that financial statement fraud caused by far the greatest median loss of the surveyed fraud schemes.
-
-At the same time organizations accelerate the digitization and reconfiguration of business processes affecting in particular Accounting Information Systems (AIS) or more general Enterprise Resource Planning (ERP) systems.
-
-![image](https://user-images.githubusercontent.com/64821137/231603383-3e6147a9-eb00-40f8-8783-de512c9c46b5.png)
-
-
-**Figure 1:** Hierarchical view of an Accounting Information System (AIS) that records distinct layers of abstraction, namely (1) the business process information, (2) the accounting information as well as the (3) technical journal entry information in designated database tables.
-
-Steadily, these systems collect vast quantities of electronic evidence at an almost atomic level. This holds in particular for the journal entries of an organization recorded in its general ledger and sub-ledger accounts. SAP, one of the most prominent ERP software providers, estimates that approx. 76% of the world's transaction revenue touches one of their systems.
-
-The illustration in **Figure 1** depicts a hierarchical view of an Accounting Information System (AIS) recording process and journal entry information in designated database tables. In the context of fraud examinations, the data collected by such systems may contain valuable traces of a potential fraud scheme.
-
 ### Classification of Financial Anomalies
-
-When conducting a detailed examination of real-world journal entries, usually recorded in large-scaled AIS or ERP systems, two prevalent characteristics can be observed:
-
-> - specific transactions attributes exhibit **a high variety of distinct attribute values** e.g. customer information, posted sub-ledgers, amount information, and 
-> - the transactions exhibit **strong dependencies between specific attribute values** e.g. between customer information and type of payment, posting type and general ledgers. 
 
 Derived from this observation we distinguish two classes of anomalous journal entries, namely **"global"** and **"local" anomalies** as illustrated in **Figure 2** below:
 
